@@ -1,4 +1,4 @@
-from typing import Literal
+from typing import Literal, List
 from dataclasses import dataclass
 
 
@@ -14,6 +14,7 @@ class Database:
 @dataclass(slots=True)
 class Django:
     secret_key: str
+    allowed_hosts: List[str]
 
 
 @dataclass(slots=True)

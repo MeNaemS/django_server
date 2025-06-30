@@ -6,9 +6,15 @@ debug = true
 host = "localhost"
 port = 5432
 
+[default.django]
+allowed_hosts = ["localhost", "127.0.0.1"]
+
 [production]
 log_level = "WARNING"
 debug = false
 
 [production.database]
 host = "postgres"
+
+[production.django]
+allowed_hosts = ["localhost", "127.0.0.1", "django", "django-server"]

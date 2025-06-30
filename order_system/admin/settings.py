@@ -28,7 +28,7 @@ SECRET_KEY = config.django.secret_key
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config.debug
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = config.django.allowed_hosts
 
 
 # Application definition
@@ -124,7 +124,12 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = 'static/'
-STATIC_ROOT = BASE_DIR / 'static'
+if not DEBUG:
+    STATIC_ROOT = BASE_DIR / 'static'
+    STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+else:
+    STATIC_ROOT = BASE_DIR / 'static'
+
 
 MEDIA_URL = 'media/'
 MEDIA_ROOT = BASE_DIR / 'media'
@@ -133,3 +138,46 @@ MEDIA_ROOT = BASE_DIR / 'media'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Logging configuration
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '[{levelname}] {asctime} {name}: {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'file': {
+            'level': config.log_level,
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': '/app/logs/django.log' if not DEBUG else 'django.log',
+            'maxBytes': 5_000_000,
+            'backupCount': 3,
+            'formatter': 'verbose',
+        },
+        'console': {
+            'level': config.log_level,
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose',
+        },
+    },
+    'root': {
+        'handlers': ['file', 'console'],
+        'level': config.log_level,
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['file', 'console'],
+            'level': config.log_level,
+            'propagate': False,
+        },
+        'management': {
+            'handlers': ['file', 'console'],
+            'level': config.log_level,
+            'propagate': False,
+        },
+    },
+}
